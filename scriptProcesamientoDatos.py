@@ -7,20 +7,24 @@ import matplotlib.pyplot as plt
 ## Praparación de los precios
 ##
 preciosDias = []
+preciosDeflectados = []
 max =0
+##
+## RECOGE LOS INDICES DE CADA AÑO DESDE 1995 - 2018, para la DEFLACTACIÓN
+##
 with open("datos/IPCs_Anuales.csv", "rb") as file:
     ipcs = pd.read_csv(file)
     ipcs = ipcs.to_numpy()[:, 1:]
     file.close()
 
 ipcs[:, 1] = ipcs[:, 1] / 100
-n = ipcs.shape[0] -1
-precios = [100]
+n = 0
+print(ipcs[0, 1])
 
-while( n >= 0):
-    precios.append(round(precios[-1] * (ipcs[n, 1] + 1), 5))
-    n -= 1
-print(len(precios), ipcs.shape[0])
+## ==================================================
+##          LISTADO DE LOS DATOS
+##          Y DEFLACTACIÓN
+## ==================================================
 for year in range(1995, 2016):
 # year = 1995
     with open("datos/precios/Precio_Bolsa_Nacional_($kwh)_"+ str(year) +".xlsx", "rb") as file:
@@ -40,9 +44,11 @@ for year in range(1995, 2016):
         datosNumpy = datosNumpy[:, :-1]
     for i in range(datosNumpy.shape[0]):
         promedio = sum(datosNumpy[i,:])/ datosNumpy.shape[1]
-        # Deflectamos los precios
         preciosDias.append(promedio)
-    
+        # Deflectamos los precios
+        promedio = promedio * (ipcs[-1, 1] / ipcs[n, 1])
+        preciosDeflectados.append(promedio)
+    n += 1
 for year in range(2016, 2019):
     with open("datos/precios/Precio_Bolsa_Nacional_($kwh)_" + str(year) + ".xls", "rb") as file:
         datos = pd.read_excel(file)
@@ -58,9 +64,13 @@ for year in range(2016, 2019):
     for i in range(datosNumpy.shape[0]):
         promedio = sum(datosNumpy[i, :]) / datosNumpy.shape[1]
         preciosDias.append(promedio)
-
-        file.close()
+        # Precios deflectados
+        promedio = promedio * (ipcs[-1, 1] / ipcs[n, 1])
+        preciosDeflectados.append(promedio)
+    n+=1
 plt.title("Precios entre 1995 - 2018")
 plt.plot([dia for dia in range(len(preciosDias))], preciosDias, color= 'black', label = "valor")
+plt.plot([dia for dia in range(len(preciosDeflectados))], preciosDeflectados, color = 'red', label = "precios deflectados")
 plt.legend()
 plt.show()
+
