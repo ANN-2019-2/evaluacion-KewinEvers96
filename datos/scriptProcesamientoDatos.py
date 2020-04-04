@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 ##
 preciosDias = []
 max =0
-
+with open("IPCs_Anuales.csv", "rb") as file:
+    datosInflacion = pd.read_csv(file)
+    print(datosInflacion)
 for year in range(1995, 2016):
 # year = 1995
     with open("datos/precios/Precio_Bolsa_Nacional_($kwh)_"+ str(year) +".xlsx", "rb") as file:
