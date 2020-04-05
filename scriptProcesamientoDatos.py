@@ -68,8 +68,8 @@ for year in range(2016, 2019):
         preciosDeflectados.append(promedio)
     n+=1
 preciosDeflectados = np.nan_to_num(np.array(preciosDeflectados))
-# preciosDeflectados = np.log(preciosDeflectados)
-# preciosDeflectados = preciosDeflectados ** (1/4)
+# preciosDeflectados1 = np.log(preciosDeflectados)
+preciosDeflectados1 = np.add(preciosDeflectados ** (1/2), 25)
 
 ## ========================================
 ##         GRÁFICA PRECIOS DEFLECTADOS
@@ -91,7 +91,8 @@ class AdalineTS:
             self.learning_rate = learning_rate
             self.X = []
             self.coef_ = [0.0] * P
-            self.intercept_ = 0.0
+            self.intercept_ = 0.
+            self.errores = []
     
     def predict(self):
         if len(self.X) < self.P:
@@ -101,10 +102,14 @@ class AdalineTS:
         u = np.dot(X, self.coef_) + self.intercept_
         return u
 
+    def get_errores(self):
+        return self.errores
+
     def fit(self, d):
         y = self.predict()
         if y is not None:
             e = d - y
+            self.errores.append(e**2)
             self.coef_ += 2 *  self.learning_rate* e * np.array(self.X)
             self.intercept_ += 2 * self.learning_rate  * e
         self.X.append(d)
@@ -114,12 +119,35 @@ class AdalineTS:
 
 adaline = AdalineTS(
     P = 5,
-    learning_rate = 0.000000025)
+    learning_rate = 0.00000002)
+
+def inversa(lista):
+    nuevaLista =[]
+    c = 0
+    for elem in lista:
+        if elem is None:
+            nuevaLista.append(None)
+            continue
+        nuevaLista.append(elem ** 2 - 25)
+        if c <= 100:
+                print(elem, elem ** 2)
+
+    return nuevaLista
 
 forecast = []
-for t, z in enumerate(preciosDeflectados):
+for t, z in enumerate(preciosDeflectados1):
     forecast.append(adaline.predict())
     adaline.fit(z)
-plt.plot(forecast, color = "red", label ="predicciones")
-plt.plot(preciosDeflectados, color = "black")
+
+
+forecasts = inversa(forecast)
+plt.plot(forecasts, color = "red", label ="precio modelo")
+plt.plot(preciosDeflectados, color = "black", label = "precio real")
+# plt.plot(preciosDeflectados1, color = 'grey', label = "sqrt(precios, 2)")
+plt.legend()
 plt.show()
+
+plt.plot(adaline.get_errores())
+plt.show()
+def encontrarMU(max_error):
+    pass
