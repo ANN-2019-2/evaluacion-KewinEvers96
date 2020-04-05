@@ -19,7 +19,6 @@ with open("datos/IPCs_Anuales.csv", "rb") as file:
 
 ipcs[:, 1] = ipcs[:, 1] / 100
 n = 0
-print(ipcs[0, 1])
 
 ## ==================================================
 ##          LISTADO DE LOS DATOS
@@ -68,9 +67,59 @@ for year in range(2016, 2019):
         promedio = promedio * (ipcs[-1, 1] / ipcs[n, 1])
         preciosDeflectados.append(promedio)
     n+=1
-plt.title("Precios entre 1995 - 2018")
-plt.plot([dia for dia in range(len(preciosDias))], preciosDias, color= 'black', label = "valor")
-plt.plot([dia for dia in range(len(preciosDeflectados))], preciosDeflectados, color = 'red', label = "precios deflectados")
-plt.legend()
-plt.show()
+preciosDeflectados = np.nan_to_num(np.array(preciosDeflectados))
+# preciosDeflectados = np.log(preciosDeflectados)
+# preciosDeflectados = preciosDeflectados ** (1/4)
 
+## ========================================
+##         GRÁFICA PRECIOS DEFLECTADOS
+## ========================================
+# plt.title("Precios entre 1995 y 2018")
+# plt.plot([dia for dia in range(len(preciosDias))], preciosDias, color= 'black', label = "valor")
+# plt.plot([dia for dia in range(len(preciosDeflectados))], preciosDeflectados, color = 'red', label = "precios deflectados")
+# plt.grid(True)
+# plt.legend()
+# plt.show()
+
+
+class AdalineTS:
+    
+    def __init__ (self,
+                    P = None,
+                    learning_rate = 0.0001):
+            self.P = P 
+            self.learning_rate = learning_rate
+            self.X = []
+            self.coef_ = [0.0] * P
+            self.intercept_ = 0.0
+    
+    def predict(self):
+        if len(self.X) < self.P:
+            return None
+        
+        X = np.array(self.X)
+        u = np.dot(X, self.coef_) + self.intercept_
+        return u
+
+    def fit(self, d):
+        y = self.predict()
+        if y is not None:
+            e = d - y
+            self.coef_ += 2 *  self.learning_rate* e * np.array(self.X)
+            self.intercept_ += 2 * self.learning_rate  * e
+        self.X.append(d)
+
+        if len(self.X) > self.P:
+            self.X.pop(0)
+
+adaline = AdalineTS(
+    P = 5,
+    learning_rate = 0.000000025)
+
+forecast = []
+for t, z in enumerate(preciosDeflectados):
+    forecast.append(adaline.predict())
+    adaline.fit(z)
+plt.plot(forecast, color = "red", label ="predicciones")
+plt.plot(preciosDeflectados, color = "black")
+plt.show()
