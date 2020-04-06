@@ -74,12 +74,13 @@ preciosDeflectados1 = np.add(preciosDeflectados ** (1/2), 25)
 ## ========================================
 ##         GRÁFICA PRECIOS DEFLECTADOS
 ## ========================================
-# plt.title("Precios entre 1995 y 2018")
-# plt.plot([dia for dia in range(len(preciosDias))], preciosDias, color= 'black', label = "valor")
-# plt.plot([dia for dia in range(len(preciosDeflectados))], preciosDeflectados, color = 'red', label = "precios deflectados")
-# plt.grid(True)
-# plt.legend()
-# plt.show()
+plt.figure(figsize = (17, 4))
+plt.title("Precios entre 1995 y 2018")
+plt.plot([dia for dia in range(len(preciosDias))], preciosDias, color= 'black', label = "valor")
+plt.plot([dia for dia in range(len(preciosDeflectados))], preciosDeflectados, color = 'red', label = "precios deflectados")
+plt.grid(True)
+plt.legend()
+plt.show()
 
 
 class AdalineTS:
